@@ -64,24 +64,6 @@ Toate comenzile sunt trimise în rețeaua locală, fără cloud extern.
 
 ---
 
-## 🧠 Exemple de funcții
-
-```cpp
-sendWLEDColor(255, 0, 0); // roșu
-````
-
-```cpp
-sendWLEDBrightness(40); // luminozitate 40/50
-```
-
-```cpp
-if (touchX > btn.x && touchX < btn.x + btn.w) {
-  sendWLEDColor(btn.r, btn.g, btn.b);
-}
-```
-
----
-
 ## 🖥️ Interfață grafică
 
 * Butoane colorate predefinite (RED, GREEN, BLUE, AQUA, etc.)
@@ -106,6 +88,3 @@ if (touchX > btn.x && touchX < btn.x + btn.w) {
 ## 👨‍💻 Autor
 
 * **Radu Gabriel Claudiu** – arhitectură software, UI TFT, comunicație HTTP, integrare WLED
-
-```
-```
