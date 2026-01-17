@@ -1,4 +1,4 @@
-# 🎨 TFT Touch WLED & Media Controller (ESP32 TouchDown v1.1)
+# TFT Touch WLED & Media Controller (ESP32 TouchDown v1.1)
 
 **TFT Touch WLED & Media Controller** is an IoT touchscreen controller based on **ESP32 TouchDown v1.1**, enabling control of **WLED** devices and **Windows media playback** over WiFi. The graphical interface runs directly on the integrated TFT display and provides quick control over **RGB LED colors**, **brightness**, and **music playback**.
 
@@ -6,9 +6,9 @@
 
 ---
 
-## 📦 Main Features
+## Main Features
 
-### 🎨 WLED Control
+### WLED Control
 - RGB color selection via tactile buttons
 - LED brightness control (BRIGHT+ / BRIGHT−)
 - Preset color palette (RED, ORANGE, YELLOW, BLUE, VIOLET, PINK, WHITE, etc.)
@@ -16,7 +16,7 @@
 - LED ON/OFF toggle
 - HTTP communication with local WLED server
 
-### 🎵 Media Control
+### Media Control
 - Previous/Next track navigation
 - Play/Pause toggle functionality
 - Real-time display of currently playing track information (title, artist, album)
@@ -25,7 +25,7 @@
 - Playback position and duration tracking
 - Works with any Windows media player (Spotify, YouTube, VLC, etc.)
 
-### 🖥️ User Interface
+### User Interface
 - 480×320px TFT graphical interface
 - Full capacitive touch control (FT6206)
 - Multi-menu navigation system (Main Menu → WLED / Music)
@@ -33,7 +33,7 @@
 - Custom transparent bitmap rendering for media control icons
 - Software-corrected touch coordinate mapping
 
-### ⚡ Technical Features
+### Technical Features
 - Fast response time without external applications
 - Easy integration into local network (LAN)
 - Bidirectional communication (ESP32 ↔ PC)
@@ -42,7 +42,7 @@
 
 ---
 
-## 🛠️ Hardware Components
+## Hardware Components
 
 | Component                  | Description                                                                 |
 |----------------------------|-----------------------------------------------------------------------------|
@@ -55,7 +55,7 @@
 
 ---
 
-## 💻 Software and Libraries
+## Software and Libraries
 
 ### ESP32 Firmware
 - **Language:** C++ (Arduino)
@@ -86,14 +86,14 @@
 
 ---
 
-## 🌐 System Architecture
+## System Architecture
 
 ### WLED Integration (HTTP API)
 The controller sends HTTP requests directly to the WLED instance on the local network:
-- 🎨 RGB color setting
-- 🔆 Global brightness adjustment
-- 🔄 Mode/preset switching
-- ⚡ Power toggle
+- RGB color setting
+- Global brightness adjustment
+- Mode/preset switching
+- Power toggle
 
 All commands are sent **locally**, without external cloud services, ensuring minimal latency and complete control.
 
@@ -115,7 +115,7 @@ The system uses a Python FastAPI server running on Windows to interface with the
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - ESP32 TouchDown v1.1 board
@@ -173,7 +173,7 @@ The system uses a Python FastAPI server running on Windows to interface with the
 
 ---
 
-## 📱 User Interface Guide
+## User Interface Guide
 
 ### Main Menu
 - **WLED Button** – Access WLED control panel
@@ -196,7 +196,7 @@ The system uses a Python FastAPI server running on Windows to interface with the
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### TFT_eSPI Configuration
 Ensure `User_Setup.h` matches ESP32 TouchDown v1.1 pinout:
@@ -219,28 +219,28 @@ uint16_t y = map(p.x, 0, 320, tft.height(), 0);
 
 ---
 
-## 🔮 Future Development
+## Future Development
 
-- 🌈 Dynamic RGB/HSV color picker
-- 💾 Save and recall color presets
-- 🎵 WLED Sound Reactive integration
-- 🌐 MQTT control protocol
-- 📱 Home Assistant integration
-- 🎚️ Volume control for media playback
-- ⏱️ Seek bar for track position
-- 📻 Radio/streaming service logos
-- 🔔 Notification system
-- 🌙 Auto brightness based on time of day
+-  Dynamic RGB/HSV color picker
+-  Save and recall color presets
+-  WLED Sound Reactive integration
+-  MQTT control protocol
+-  Home Assistant integration
+-  Volume control for media playback
+-  Seek bar for track position
+-  Radio/streaming service logos
+-  Notification system
+-  Auto brightness based on time of day
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 *Coming soon*
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### ESP32 not connecting to WiFi
 - Verify `secrets.h` credentials
@@ -265,13 +265,13 @@ uint16_t y = map(p.x, 0, 320, tft.height(), 0);
 
 ---
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Radu Gabriel Claudiu**
 - Software architecture
@@ -284,7 +284,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **TFT_eSPI** library by Bodmer
 - **Adafruit** for FT6206 library
@@ -294,7 +294,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## 📞 Support
+## Support
 
 For issues, questions, or contributions, please open an issue on the GitHub repository.
 
