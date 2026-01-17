@@ -100,10 +100,10 @@ All commands are sent **locally**, without external cloud services, ensuring min
 ### Media Control Integration
 The system uses a Python FastAPI server running on Windows to interface with the Windows Media Transport Controls API:
 ```
-┌─────────────┐      HTTP GET/POST      ┌──────────────┐      Windows API      ┌─────────────┐
-│  ESP32      │ ◄───────────────────────► │  FastAPI     │ ◄──────────────────► │   Media     │
-│  TouchDown  │      WiFi (LAN)          │  Server      │                      │   Players   │
-└─────────────┘                          └──────────────┘                      └─────────────┘
+┌─────────────┐      HTTP GET/POST      ┌──────────────┐      Windows API     ┌─────────────┐
+│  ESP32      │ ◄─────────────────────► │  FastAPI     │ ◄──────────────────► │   Media     │
+│  TouchDown  │      WiFi (LAN)         │  Server      │                      │   Players   │
+└─────────────┘                         └──────────────┘                      └─────────────┘
 ```
 
 **Data flow:**
