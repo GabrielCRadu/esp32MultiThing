@@ -1,0 +1,16 @@
+# WiFi credentials: each sketch reads them from its own secrets.h
+secrets.h
+# Old sketches with the WiFi credentials in the code
+oldRevLightsProject/
+
+# Python
+__pycache__/
+*.pyc
+*.log
+
+# Third-party binary used by Python/stats.py (download it next to the script)
+Python/PresentMon.exe
+
+# Per-machine editor / tool settings
+.vscode/
+.claude/settings.local.json
