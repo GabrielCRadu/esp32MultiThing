@@ -1,267 +1,145 @@
-# TFT Touch WLED & Media Controller (ESP32 TouchDown v1.1)
+# ESP32 MultiThing – touchscreen hub for WLED, media, sim racing and more
 
-**TFT Touch WLED & Media Controller** is an IoT touchscreen controller based on **ESP32 TouchDown v1.1**, enabling control of **WLED** devices and **Windows media playback** over WiFi. The graphical interface runs directly on the integrated TFT display and provides quick control over **RGB LED colors**, **brightness**, and **music playback**.
+**ESP32 MultiThing** turns an **ESP32 TouchDown** (480×320 capacitive touch TFT) into a small desk hub: it controls **WLED** lights, shows and controls **Windows media playback**, displays **sim-racing telemetry**, **PC stats** and the **weather**, and can even act as a tiny **secondary Windows monitor** over USB.
 
-> Educational project focused on embedded UI, HTTP communication, and integration with smart home ecosystems (WLED) and desktop media control, using an all-in-one board with display and touch capabilities.
+Everything runs on your LAN. A Python server on the Windows PC bridges the things the ESP32 cannot reach on its own (media sessions, volume, PC sensors, game telemetry).
 
----
-
-## Main Features
-
-### WLED Control
-- RGB color selection via tactile buttons
-- LED brightness control (BRIGHT+ / BRIGHT−)
-- Preset color palette (RED, ORANGE, YELLOW, BLUE, VIOLET, PINK, WHITE, etc.)
-- Mode switching (Solid / AmbiWLED)
-- LED ON/OFF toggle
-- HTTP communication with local WLED server
-
-### Media Control
-- Previous/Next track navigation
-- Play/Pause toggle functionality
-- Real-time display of currently playing track information (title, artist, album)
-- Album artwork display (128×128px thumbnail)
-- Automatic UI refresh on track changes
-- Playback position and duration tracking
-- Works with any Windows media player (Spotify, YouTube, VLC, etc.)
-
-### User Interface
-- 480×320px TFT graphical interface
-- Full capacitive touch control (FT6206)
-- Multi-menu navigation system (Main Menu → WLED / Music)
-- Optimized layout for touch interaction (large buttons, rounded corners)
-- Custom transparent bitmap rendering for media control icons
-- Software-corrected touch coordinate mapping
-
-### Technical Features
-- Fast response time without external applications
-- Easy integration into local network (LAN)
-- Bidirectional communication (ESP32 ↔ PC)
-- RESTful API architecture
-- Asynchronous operations for smooth UI performance
+> Hobby project focused on embedded UI, HTTP/UDP communication and integration with WLED and the Windows desktop.
 
 ---
 
-## Hardware Components
+## Apps
 
-| Component                  | Description                                                                 |
-|----------------------------|-----------------------------------------------------------------------------|
-| **ESP32 TouchDown v1.1**   | All-in-one ESP32 board with WiFi, TFT, and integrated touchscreen          |
-| **TFT 480×320**            | Integrated color display, `TFT_eSPI` compatible                             |
-| **FT6206**                 | Capacitive touchscreen controller (I2C), integrated on board               |
-| **WLED Server**            | HTTP API-compatible RGB LED controller                                      |
-| **Windows PC**             | Runs FastAPI server for media control integration                           |
-| **WiFi Network**           | Local communication between ESP32 TouchDown, WLED, and PC                   |
+The home screen shows a large clock, the date and a weather widget. **APPS** opens the App Drawer with these apps:
 
----
-
-## Software and Libraries
-
-### ESP32 Firmware
-- **Language:** C++ (Arduino)
-- **Platform:** Arduino IDE
-- **Libraries:**
-  - `TFT_eSPI` – TFT graphics rendering
-  - `Adafruit_FT6206` – Capacitive touch reading
-  - `WiFi.h` – WiFi network connectivity
-  - `HTTPClient.h` – HTTP request handling
-  - `ArduinoJson.h` – JSON parsing for media data
-  - `TJpg_Decoder.h` – JPEG decoding for album artwork
-- **Configuration file:** `secrets.h`  
-  (contains WiFi SSID and password)
-
-### Python FastAPI Server
-- **Language:** Python 3.8+
-- **Framework:** FastAPI
-- **Libraries:**
-  - `fastapi` – RESTful API server
-  - `uvicorn` – ASGI server
-  - `winsdk` – Windows Media Transport Controls integration
-  - `Pillow (PIL)` – Image processing for thumbnails
-- **Features:**
-  - Control endpoints (POST): `/control/play`, `/control/pause`, `/control/next`, `/control/previous`, `/control/toggle`
-  - Data endpoints (GET): `/media`, `/media/thumbnail`
-  - CORS middleware for cross-origin access
-  - Async operations for non-blocking performance
+| App | What it does |
+|-----|--------------|
+| **WLED** | Preset colours, brightness, on/off. Modes: **Solid**, **AmbiWLED** and **Music Cover** (the LEDs follow the colours of the current album art). |
+| **Music** | Album art as a spinning vinyl, scrolling title/artist, progress, previous / play-pause / next. Swipe along the top bar to change the Windows volume. Works with any player that shows up in Windows media controls (Spotify, browsers, VLC, ...). |
+| **Racing** | Live dashboard for **Assetto Corsa**, **Forza Horizon (FH6)** and **BeamNG.drive**: RPM, gear, speed, pedals, lap times, plus a telemetry tab (tyre temperatures, boost). Optional **WLED rev lights**. |
+| **USB Display** | The TFT becomes a 480×320 secondary Windows monitor over the USB cable, with touch working as the mouse. See [tools/usb_display/README.md](tools/usb_display/README.md). |
+| **PC Stats** | CPU, GPU, RAM and disk usage, plus temperatures when available, refreshed every 2 s. |
+| **Settings** | Time zone (UTC offset) and NTP time sync. |
+| **Weather** | Current conditions from [Open-Meteo](https://open-meteo.com/) plus an optional local BME280 sensor, with a history graph. Read directly by the ESP32, no PC needed. |
 
 ---
 
-## System Architecture
+## Repository layout
 
-### WLED Integration (HTTP API)
-The controller sends HTTP requests directly to the WLED instance on the local network:
-- RGB color setting
-- Global brightness adjustment
-- Mode/preset switching
-- Power toggle
-
-All commands are sent **locally**, without external cloud services, ensuring minimal latency and complete control.
-
-### Media Control Integration
-The system uses a Python FastAPI server running on Windows to interface with the Windows Media Transport Controls API:
 ```
-┌─────────────┐      HTTP GET/POST      ┌──────────────┐      Windows API     ┌─────────────┐
-│  ESP32      │ ◄─────────────────────► │  FastAPI     │ ◄──────────────────► │   Media     │
-│  TouchDown  │      WiFi (LAN)         │  Server      │                      │   Players   │
-└─────────────┘                         └──────────────┘                      └─────────────┘
+Arduino/esp32MultiThing/   ESP32 sketch (Arduino IDE): UI, touch, HTTP/UDP clients
+Arduino/Resources/         Source PNGs of the media control icons
+Python/music.py            FastAPI server on the PC (port 8000): media, volume, stats, game telemetry
+Python/ac_relay.py         UDP relay for Assetto Corsa telemetry (AC only listens on localhost)
+Python/chrome_extension/   Optional browser extension: exact playback position for web players
+Python/stats.py            Optional standalone stats/FPS server (port 8001, uses PresentMon)
+tools/usb_display/         PC side of the USB Display app
 ```
 
-**Data flow:**
-1. ESP32 requests current media info via GET `/media`
-2. FastAPI queries Windows SMTC and returns JSON with track metadata
-3. ESP32 downloads album artwork via GET `/media/thumbnail`
-4. User touch triggers POST requests to `/control/*` endpoints
-5. FastAPI executes corresponding media control commands
+---
+
+## Architecture
+
+```
+                         WiFi (LAN)
+ ESP32 TouchDown  ---- HTTP -------> WLED controller
+       |          ---- HTTP -------> Python/music.py (PC, :8000)
+       |                               |-- Windows media controls (SMTC), volume (pycaw)
+       |                               |-- CPU / GPU / RAM / disk stats
+       |                               '-- Forza (UDP 5300) and BeamNG (UDP 4445) telemetry
+       |          ---- UDP --------> Python/ac_relay.py (PC, :9997) --> Assetto Corsa (127.0.0.1:9996)
+       |          ---- HTTPS ------> Open-Meteo,  HTTP --> BME280 sensor
+       '---- USB serial -----------> tools/usb_display/usb_display.py (secondary monitor)
+```
+
+Every network request has a short timeout (1 s to connect on the LAN), so an offline PC, sensor or WLED does not freeze the touch UI.
 
 ---
 
-## Getting Started
+## Hardware
 
-### Prerequisites
-- ESP32 TouchDown v1.1 board
-- Arduino IDE with ESP32 board support
-- Python 3.8+ installed on Windows PC
-- WLED controller on local network (optional)
-- Required Arduino libraries installed
-- Required Python packages installed
+| Component | Notes |
+|-----------|-------|
+| **ESP32 TouchDown** | ESP32 with an ILI9488 480×320 SPI TFT, FT6206 capacitive touch (I2C) and a CP2102 USB-serial bridge |
+| **WLED controller** | Optional, any WLED device on the LAN |
+| **Windows 10/11 PC** | Runs `music.py`; needed for Music, PC Stats, Racing and USB Display |
+| **BME280 sensor** | Optional, a device that serves `/api/json` with temperature, humidity and pressure |
 
-### ESP32 Setup
+---
 
-1. **Install Arduino Libraries:**
-```
-   - TFT_eSPI
-   - Adafruit_FT6206
-   - ArduinoJson
-   - TJpg_Decoder
-```
+## Getting started
 
-2. **Configure WiFi:**
-   Create `secrets.h` file:
-```cpp
-   #define WIFI_SSID "YourNetworkName"
+### 1. Firmware (ESP32)
+
+1. Install the **ESP32** board package in the Arduino IDE and these libraries:
+   `TFT_eSPI`, `Adafruit_FT6206`, `ArduinoJson`, `TJpg_Decoder`.
+2. Configure `TFT_eSPI` for the board (in its `User_Setup_Select.h` / a custom setup file):
+   ```cpp
+   #define ILI9488_DRIVER
+   #define TFT_MISO 19
+   #define TFT_MOSI 23
+   #define TFT_SCLK 18
+   #define TFT_CS   15
+   #define TFT_DC    2
+   #define TFT_RST   4
+   #define TFT_BL   32
+   #define SPI_FREQUENCY 27000000
+   ```
+3. Create `Arduino/esp32MultiThing/secrets.h` (it is git-ignored):
+   ```cpp
+   #define WIFI_SSID     "YourNetworkName"
    #define WIFI_PASSWORD "YourPassword"
-```
+   ```
+4. Set the addresses of your devices at the top of `esp32MultiThing.ino`:
+   ```cpp
+   const char* serverName     = "http://192.168.1.135";       // WLED
+   const char* mediaServerUrl = "http://192.168.1.136:8000";  // PC running music.py
+   const char* acServerIp     = "192.168.1.136";              // PC running ac_relay.py
+   ```
+   The BME280 address and the Open-Meteo coordinates are in `fetchWeatherData()`.
+5. Board **ESP32 Dev Module**, default partition scheme, then upload. With the CLI:
+   ```bash
+   arduino-cli compile -b esp32:esp32:esp32 Arduino/esp32MultiThing/
+   arduino-cli upload  -b esp32:esp32:esp32 -p COM3 Arduino/esp32MultiThing/
+   ```
 
-3. **Update Server URLs:**
-   In main sketch, update:
-```cpp
-   const char* serverName = "http://192.168.1.135";        // WLED IP
-   const char* mediaServerUrl = "http://192.168.1.136:8000"; // PC IP
-```
+### 2. PC server (Windows)
 
-4. **Upload Sketch:**
-   - Connect ESP32 TouchDown via USB
-   - Select board: "ESP32 Dev Module"
-   - Upload the sketch
-
-### Python Server Setup
-
-1. **Install Dependencies:**
 ```bash
-   pip install fastapi uvicorn winsdk Pillow
+cd Python
+pip install fastapi uvicorn winsdk Pillow pycaw psutil
+pip install pystray pynvml        # optional: tray icon, NVIDIA GPU stats
+python music.py
 ```
 
-2. **Run the Server:**
-```bash
-   python media_server.py
-```
-   Server will start on `http://0.0.0.0:8000`
+The server listens on `http://0.0.0.0:8000`. `start.vbs` starts it hidden, with a tray icon. Main endpoints:
 
-3. **Verify Endpoints:**
-   - Open browser: `http://localhost:8000/media`
-   - Should return current media information (if playing)
+| Endpoint | Use |
+|----------|-----|
+| `GET /media`, `/media/thumbnail`, `/media/colors` | Track info, album art, dominant colours |
+| `POST /control/play`, `/pause`, `/next`, `/previous`, `/toggle` | Playback control |
+| `GET /volume`, `POST /volume/up`, `/volume/down` | Windows master volume |
+| `GET /stats` | CPU / GPU / RAM / disk |
+| `GET /forza`, `/beamng` | Latest game telemetry |
 
----
+Allow Python through the Windows firewall on private networks so the ESP32 can reach it.
 
-## User Interface Guide
+### 3. Optional extras
 
-### Main Menu
-- **WLED Button** – Access WLED control panel
-- **Music Button** – Access media control panel
-
-### WLED Menu
-- **Color Buttons** – Select preset RGB colors
-- **BRIGHT+/BRIGHT−** – Adjust LED brightness (±25 steps)
-- **MODE** – Toggle between Solid and AmbiWLED presets
-- **ON/OFF** – Toggle LED power state
-- **BACK** – Return to main menu
-
-### Music Menu
-- **Album Artwork** – 128×128px thumbnail (left side)
-- **Track Info** – Title and artist display
-- **Previous (⏮)** – Skip to previous track
-- **Play/Pause (⏯)** – Toggle playback
-- **Next (⏭)** – Skip to next track
-- **Auto-refresh** – Updates every 1 second when active
-
----
-
-## Configuration
-
-### TFT_eSPI Configuration
-Ensure `User_Setup.h` matches ESP32 TouchDown v1.1 pinout:
-```cpp
-#define ILI9488_DRIVER
-#define TFT_MISO 12
-#define TFT_MOSI 13
-#define TFT_SCLK 14
-#define TFT_CS   15
-#define TFT_DC   2
-#define TFT_RST  -1
-```
-
-### Touch Coordinate Mapping
-The sketch includes software correction for proper touch mapping:
-```cpp
-uint16_t x = map(p.y, 0, 480, 0, tft.width());
-uint16_t y = map(p.x, 0, 320, tft.height(), 0);
-```
-
----
-
-## Future Development
-
--  Dynamic RGB/HSV color picker
--  Save and recall color presets
--  WLED Sound Reactive integration
--  MQTT control protocol
--  Home Assistant integration
--  Volume control for media playback
--  Seek bar for track position
--  Radio/streaming service logos
--  Notification system
--  Auto brightness based on time of day
-
----
-
-## Screenshots
-
-*Coming soon*
+- **Assetto Corsa:** run `python ac_relay.py` on the gaming PC next to `music.py`.
+- **Forza / BeamNG:** point the game's UDP telemetry output to the PC (`127.0.0.1`, ports 5300 / 4445).
+- **Browser players:** load `Python/chrome_extension` as an unpacked extension for an exact playback position.
+- **USB Display:** follow [tools/usb_display/README.md](tools/usb_display/README.md) (virtual monitor driver + `usb_display.py`).
 
 ---
 
 ## Troubleshooting
 
-### ESP32 not connecting to WiFi
-- Verify `secrets.h` credentials
-- Check WiFi signal strength
-- Ensure 2.4GHz network (ESP32 doesn't support 5GHz)
-
-### WLED commands not working
-- Verify WLED IP address in `serverName`
-- Test WLED API manually: `http://WLED_IP/win&T=2`
-- Check firewall settings
-
-### Media control not responding
-- Ensure FastAPI server is running on PC
-- Verify PC IP address in `mediaServerUrl`
-- Check that media is playing on Windows
-- Test endpoint manually: `http://PC_IP:8000/media`
-
-### Album artwork not displaying
-- Ensure `TJpg_Decoder` library is installed
-- Check server logs for thumbnail errors
-- Verify media player provides artwork via SMTC
+- **ESP32 not connecting to WiFi:** check `secrets.h`; the ESP32 only supports 2.4 GHz networks.
+- **WLED commands do nothing:** check `serverName`; test `http://WLED_IP/win&T=2` in a browser.
+- **Music / PC Stats empty:** make sure `music.py` runs, `mediaServerUrl` points to the PC and the firewall allows port 8000. Test `http://PC_IP:8000/media`.
+- **Touch feels slow:** an offline device can still cost up to 1 s per request; remove or fix addresses you do not use.
+- **Album art missing:** the player must publish artwork to Windows media controls.
 
 ---
 
@@ -274,29 +152,17 @@ This project is open source and available under the [MIT License](LICENSE).
 ## Author
 
 **Radu Gabriel Claudiu**
-- Software architecture
-- TFT UI design
-- Touch logic implementation
-- HTTP communication
-- WLED integration
-- FastAPI media server development
-- Windows Media Transport Controls integration
 
 ---
 
 ## Acknowledgments
 
-- **TFT_eSPI** library by Bodmer
-- **Adafruit** for FT6206 library
+- **TFT_eSPI** and **TJpg_Decoder** libraries by Bodmer
+- **Adafruit** for the FT6206 library
 - **WLED** project by Aircoookie
 - **FastAPI** framework by Sebastián Ramírez
+- **Open-Meteo** for the free weather API
 - ESP32 TouchDown hardware design
-
----
-
-## Support
-
-For issues, questions, or contributions, please open an issue on the GitHub repository.
 
 ---
 
